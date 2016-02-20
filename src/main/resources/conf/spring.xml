@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-4.1.xsd
+      ">
+ 
+    <!-- 引入jdbc配置文件 -->
+    <context:property-placeholder location="classpath:conf/*.properties"/>
+  <!-- 扫描文件（自动将service层注入） -->
+    <context:component-scan base-package="com.springmvc.service"/>
+    
+    <!-- <bean id="dbconfig" class="com.shareus.configuration.ContextConfig">
+    	<property name="dbhost" value="${db.host}" />
+    	<property name="dbuser" value="${db.user}"></property>
+    	<property name="dbport" value="${db.port}"></property>
+    </bean> -->
+    
+   <!--  <bean id="spiderTest" class="com.shareus.utils.SpiderTest">
+    	<property name="dbhost" value="${db.host}" />
+    	<property name="dbuser" value="${db.user}"></property>
+    	<property name="dbport" value="${db.port}"></property>
+    </bean> -->
+    <!-- <bean id="deliverySMS" class="com.shareus.utils.DeliverySMS">
+		<property name="ACCOUNTNAME" value="${webapp.changtianyou_account}"></property>
+		<property name="PASSWORD" value="${webapp.changtianyou_pwd}"></property>
+		<property name="SENDURL" value="${webapp.changtianyou_sendurl}"></property>
+		<property name="SMSTMPL" value="${webapp.changtianyou_contenttmpl}"></property>
+	</bean>	 -->
+    <!-- 事务 -->
+	
+</beans>
