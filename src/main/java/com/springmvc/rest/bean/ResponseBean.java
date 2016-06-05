@@ -2,10 +2,13 @@ package com.springmvc.rest.bean;
 
 import java.io.Serializable;
 
-/**
- * Created by Huang, Hua on 2014/12/10.
- */
 
+
+/**
+ * the response entity self-defined
+ * @author Administrator
+ *
+ */
 public class ResponseBean implements Serializable {
 
     /**
@@ -13,8 +16,14 @@ public class ResponseBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+    /**
+     * the status of response
+     */
     private Integer status;
 
+    /**
+     * the message of response
+     */
     private String message;
 
     public ResponseBean() { }

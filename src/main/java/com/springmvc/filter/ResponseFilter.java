@@ -11,6 +11,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class ResponseFilter extends OncePerRequestFilter {
 
+	/**
+	 * update the request headers and allows the request to support the cross domain
+	 * 
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");
