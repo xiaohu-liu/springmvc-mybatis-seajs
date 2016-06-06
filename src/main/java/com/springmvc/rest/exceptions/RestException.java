@@ -14,8 +14,14 @@ public class RestException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * response status of application
+	 */
 	private Integer status;
 
+	/**
+	 * response message of application
+	 */
 	private String message;
 
 	public RestException() {
@@ -35,6 +41,12 @@ public class RestException extends Exception {
 		return message;
 	}
 
+	/**
+	 * convert the RestException instance to the JSON format
+	 * @param restException
+	 * 			the RestException to convert
+	 * @return
+	 */
 	public static String exceptionToJson(RestException restException) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("status", restException.getStatus());
@@ -42,6 +54,12 @@ public class RestException extends Exception {
 		return jsonObject.toString();
 	}
 	
+	/**
+	 * convert the RestException instance to the JSON instance
+	 * @param e
+	 * 			RestException instance
+	 * @return
+	 */
 	public static JSONObject exceptionToJSONObject(RestException e){
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("status", e.getStatus());
