@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -39,6 +40,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import com.google.api.client.http.HttpHeaders;
+
 /**
  * HttpClient Util
  * 
@@ -58,23 +61,28 @@ public class HttpClientUtils {
 
 	/**
 	 * 发送HTTP_PUT请求
+	 * 
 	 * @param reqURL
 	 * @param jsonBody
 	 * @param decodeCharset
 	 * @return
 	 */
-	public static Map<String, String> sendJsonPutRequest(String reqURL,String jsonBody, String decodeCharset) {
+	public static Map<String, String> sendJsonPutRequest(String reqURL, String jsonBody, String decodeCharset,
+			String cookie) {
 		long responseLength = 0; // 响应长度
 		String responseContent = null; // 响应内容
 		HttpClient httpClient = new DefaultHttpClient(); // 创建默认的httpClient实例
 		HttpPut httpPut = new HttpPut(reqURL);
 		httpPut.addHeader("Accept", "application/json");
 		httpPut.setHeader(HTTP.CONTENT_TYPE, "application/json");
+		if (cookie != null) {
+			httpPut.setHeader("Cookie", cookie);
+		}
 		Integer statusCode = 200;
 		Map<String, String> map = new HashMap<String, String>();
 		try {
-			//添加json格式的请求数据
-			if(StringUtils.isNotBlank(jsonBody)){
+			// 添加json格式的请求数据
+			if (StringUtils.isNotBlank(jsonBody)) {
 				httpPut.setEntity(new StringEntity(jsonBody));
 			}
 			HttpResponse response = httpClient.execute(httpPut); // 执行PUT请求
@@ -85,6 +93,18 @@ public class HttpClientUtils {
 				responseContent = EntityUtils.toString(entity, decodeCharset == null ? "UTF-8" : decodeCharset);
 				EntityUtils.consume(entity); // Consume response content
 			}
+
+			Header[] headers = response.getAllHeaders();
+			if (headers != null) {
+				for (Header header : headers) {
+					if (header.getName().toLowerCase().contains("cookie")) {
+						cookie += header.getValue();
+						// break;
+					}
+				}
+			}
+			statusCode = response.getStatusLine().getStatusCode();
+
 			logger.debug("请求地址: " + httpPut.getURI());
 			logger.debug("响应状态: " + response.getStatusLine());
 			logger.debug("响应长度: " + responseLength);
@@ -101,13 +121,10 @@ public class HttpClientUtils {
 
 		map.put("resMsg", responseContent);
 		map.put("statusCode", String.valueOf(statusCode));
+		map.put("Cookie", cookie);
 		return map;
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * 发送HTTP_DELETE请求
 	 * 
@@ -118,13 +135,14 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static Map<String, String> sendJsonDeleteRequest(String reqURL, String jsonBody, String decodeCharset, String cookie) {
+	public static Map<String, String> sendJsonDeleteRequest(String reqURL, String jsonBody, String decodeCharset,
+			String cookie) {
 		long responseLength = 0; // 响应长度
 		String responseContent = null; // 响应内容
 		HttpClient httpClient = new DefaultHttpClient(); // 创建默认的httpClient实例
 		HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(reqURL);
 		httpDelete.addHeader("Accept", HttpClientUtils.CONTENT_TYPE_JSON);
-		
+
 		Map<String, String> map = new HashMap<String, String>();
 		Integer statusCode = 200;
 		if (StringUtils.isNotBlank(cookie)) {
@@ -142,8 +160,8 @@ public class HttpClientUtils {
 			if (headers != null) {
 				for (Header header : headers) {
 					if (header.getName().toLowerCase().contains("cookie")) {
-						cookie = header.getValue();
-						break;
+						cookie += header.getValue();
+						// break;
 					}
 				}
 			}
@@ -192,9 +210,9 @@ public class HttpClientUtils {
 		String responseContent = null; // 响应内容
 		HttpClient httpClient = new DefaultHttpClient(); // 创建默认的httpClient实例
 		HttpGet httpGet = new HttpGet(reqURL); // 创建org.apache.http.client.methods.HttpGet
-		httpGet.setHeader("accessAppKey","Ml9kYXRhX29uZV8xMjM=");
-		//Ml9kYXRhX29uZV8xMjM=
-		//Ml9kYXRhX29uZV8xM=
+		// httpGet.setHeader("accessAppKey","Ml9kYXRhX29uZV8xMjM=");
+		// Ml9kYXRhX29uZV8xMjM=
+		// Ml9kYXRhX29uZV8xM=
 		try {
 			HttpResponse response = httpClient.execute(httpGet); // 执行GET请求
 			HttpEntity entity = response.getEntity(); // 获取响应实体
@@ -235,7 +253,7 @@ public class HttpClientUtils {
 		HttpClient httpClient = new DefaultHttpClient(); // 创建默认的httpClient实例
 		HttpGet httpGet = new HttpGet(reqURL); // 创建org.apache.http.client.methods.HttpGet
 		httpGet.addHeader("Accept", "application/json");
-		
+
 		Integer statusCode = 200;
 		Map<String, String> map = new HashMap<String, String>();
 		try {
@@ -266,20 +284,27 @@ public class HttpClientUtils {
 		return map;
 	}
 
-	public static Map<String, String> sendJsonGetRequest2(String reqURL, String decodeCharset, String contentType, String cookie) {
+	/**
+	 * Send the Get request with cookie
+	 * 
+	 * @param reqURL
+	 * @param decodeCharset
+	 * @param contentType
+	 * @param cookie
+	 * @return
+	 */
+	public static Map<String, String> sendJsonGetRequest(String reqURL, String decodeCharset, String contentType) {
 		long responseLength = 0; // 响应长度
 		String responseContent = null; // 响应内容
 		HttpClient httpClient = new DefaultHttpClient(); // 创建默认的httpClient实例
 		HttpGet httpGet = new HttpGet(reqURL); // 创建org.apache.http.client.methods.HttpGet
 		httpGet.addHeader("Accept", "application/json");
 		if (StringUtils.isBlank(contentType)) {
-
+			// TODO
 		} else {
 			httpGet.setHeader(HTTP.DEFAULT_CONTENT_CHARSET, "UTF-8");// 设置默认的请求内容编码是UTF-8编码
 		}
-		if (StringUtils.isNotBlank(cookie)) {
-			httpGet.addHeader("Cookie", cookie);
-		}
+
 		Integer statusCode = 200;
 		Map<String, String> map = new HashMap<String, String>();
 		try {
@@ -311,7 +336,8 @@ public class HttpClientUtils {
 	/**
 	 * 发送HTTP_POST请求
 	 * 
-	 * @see 该方法为<code>sendPostRequest(String,String,boolean,String,String)</code>
+	 * @see 该方法为
+	 *      <code>sendPostRequest(String,String,boolean,String,String)</code>
 	 *      的简化方法
 	 * @see 该方法在对请求数据的编码和响应数据的解码时,所采用的字符集均为UTF-8
 	 * @see 当<code>isEncoder=true</code>时,其会自动对<code>sendData</code>中的[中文][|][
@@ -342,7 +368,8 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static String sendPostRequest(String reqURL, String sendData, boolean isEncoder, String encodeCharset, String decodeCharset) {
+	public static String sendPostRequest(String reqURL, String sendData, boolean isEncoder, String encodeCharset,
+			String decodeCharset) {
 		String responseContent = null;
 		HttpClient httpClient = null;
 		httpClient = new DefaultHttpClient();
@@ -352,9 +379,11 @@ public class HttpClientUtils {
 			if (isEncoder) {
 				List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 				for (String str : sendData.split("&")) {
-					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")), str.substring(str.indexOf("=") + 1)));
+					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")),
+							str.substring(str.indexOf("=") + 1)));
 				}
-				httpPost.setEntity(new StringEntity(URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
+				httpPost.setEntity(new StringEntity(
+						URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
 			} else {
 				httpPost.setEntity(new StringEntity(sendData));
 			}
@@ -393,8 +422,8 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static Map<String, String> sendPostRequestContainCookies(String reqURL, String sendData, boolean isEncoder, String encodeCharset,
-			String decodeCharset) {
+	public static Map<String, String> sendPostRequestContainCookies(String reqURL, String sendData, boolean isEncoder,
+			String encodeCharset, String decodeCharset) {
 		String responseContent = null;
 		HttpClient httpClient = null;
 		httpClient = new DefaultHttpClient();
@@ -407,9 +436,11 @@ public class HttpClientUtils {
 			if (isEncoder) {
 				List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 				for (String str : sendData.split("&")) {
-					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")), str.substring(str.indexOf("=") + 1)));
+					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")),
+							str.substring(str.indexOf("=") + 1)));
 				}
-				httpPost.setEntity(new StringEntity(URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
+				httpPost.setEntity(new StringEntity(
+						URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
 			} else {
 				httpPost.setEntity(new StringEntity(sendData));
 			}
@@ -420,9 +451,9 @@ public class HttpClientUtils {
 			// HttpOnly
 			Header[] headers = response.getAllHeaders();
 			for (Header header : headers) {
-				if (header.getName().equals("Set-Cookie")) {
-					cookie = header.getValue();
-					break;
+				if (header.getName().toLowerCase().contains("cookie")) {
+					cookie += header.getValue();
+					// break;
 				}
 			}
 			HttpEntity entity = response.getEntity();
@@ -430,6 +461,7 @@ public class HttpClientUtils {
 				responseContent = EntityUtils.toString(entity, decodeCharset == null ? "UTF-8" : decodeCharset);
 				EntityUtils.consume(entity);
 			}
+
 		} catch (Exception e) {
 			logger.error("与[" + reqURL + "]通信过程中发生异常,堆栈信息如下", e);
 		} finally {
@@ -460,8 +492,8 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static Map<String, String> sendJsonPostRequest(String reqURL, String sendData, boolean isEncoder, String encodeCharset,
-			String decodeCharset, String contentType, String cookie) {
+	public static Map<String, String> sendJsonPostRequest(String reqURL, String sendData, boolean isEncoder,
+			String encodeCharset, String decodeCharset, String contentType, String cookie) {
 		String responseContent = null;
 		HttpClient httpClient = null;
 		httpClient = new DefaultHttpClient();
@@ -484,9 +516,11 @@ public class HttpClientUtils {
 			if (isEncoder) {
 				List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 				for (String str : sendData.split("&")) {
-					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")), str.substring(str.indexOf("=") + 1)));
+					formParams.add(new BasicNameValuePair(str.substring(0, str.indexOf("=")),
+							str.substring(str.indexOf("=") + 1)));
 				}
-				httpPost.setEntity(new StringEntity(URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
+				httpPost.setEntity(new StringEntity(
+						URLEncodedUtils.format(formParams, encodeCharset == null ? "UTF-8" : encodeCharset)));
 			} else {
 				httpPost.setEntity(new StringEntity(sendData));
 			}
@@ -494,9 +528,9 @@ public class HttpClientUtils {
 			statusCode = response.getStatusLine().getStatusCode();
 			Header[] headers = response.getAllHeaders();
 			for (Header header : headers) {
-				if (header.getName().equals("Set-Cookie")) {
-					cookie = header.getValue();
-					break;
+				if (header.getName().toLowerCase().contains("cookie")) {
+					cookie += header.getValue();
+					// break;
 				}
 			}
 			HttpEntity entity = response.getEntity();
@@ -532,7 +566,8 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static String sendPostRequest(String reqURL, Map<String, String> params, String encodeCharset, String decodeCharset) {
+	public static String sendPostRequest(String reqURL, Map<String, String> params, String encodeCharset,
+			String decodeCharset) {
 		String responseContent = null;
 		HttpClient httpClient = new DefaultHttpClient();
 
@@ -561,7 +596,8 @@ public class HttpClientUtils {
 	/**
 	 * 发送HTTPS_POST请求
 	 * 
-	 * @see 该方法为<code>sendPostSSLRequest(String,Map<String,String>,String,String)</code>
+	 * @see 该方法为
+	 *      <code>sendPostSSLRequest(String,Map<String,String>,String,String)</code>
 	 *      方法的简化方法
 	 * @see 该方法在对请求数据的编码和响应数据的解码时,所采用的字符集均为UTF-8
 	 * @see 该方法会自动对<code>params</code>中的[中文][|][ ]等特殊字符进行
@@ -587,7 +623,8 @@ public class HttpClientUtils {
 	 *            解码字符集,解析响应数据时用之,其为null时默认采用UTF-8解码
 	 * @return 远程主机响应正文
 	 */
-	public static String sendPostSSLRequest(String reqURL, Map<String, String> params, String encodeCharset, String decodeCharset) {
+	public static String sendPostSSLRequest(String reqURL, Map<String, String> params, String encodeCharset,
+			String decodeCharset) {
 		String responseContent = "";
 		HttpClient httpClient = new DefaultHttpClient();
 		X509TrustManager xtm = new WechatX509TrustManager();
@@ -828,34 +865,23 @@ public class HttpClientUtils {
 	}
 
 	public static void main(String[] args) {
-		// final String clientUrl =
-		// "http://127.0.0.1:8080/acre-core-test/ldap/user/page";
-		// final String clientJsonData = "{\"pageSize\":10,\"destPage\":2}";
-		// String responseBodyString =
-		// HttpClientUtils.sendJsonPostRequest(clientUrl, clientJsonData, false,
-		// "utf-8", "utf-8");
-		// System.err.println(responseBodyString);
-
-		// final String kerberosUrl =
-		// "http://10.100.16.114:10080/user/principal?request=add";
-		// final String requestboydString =
-		// "{\"username\":\"kerbertest1\",\"password\":\"kerbertest1\"}";
-		// String responseBodyString =
-		// HttpClientUtils.sendJsonPostRequest(kerberosUrl, requestboydString,
-		// false, HttpClientUtils.DEFAULT_CHARSET,
-		// HttpClientUtils.DEFAULT_CHARSET);
-		// System.out.println(responseBodyString);
 
 		final String kerberosUrl = "http://10.100.16.114:10080/user/sys?request=add";
 		final String requestboydString = "{\"username\":\"systest1\",\"group\":\"hive\"}";
-		Map<String, String> map = HttpClientUtils.sendJsonPostRequest(kerberosUrl, requestboydString, false, HttpClientUtils.DEFAULT_CHARSET,
-				HttpClientUtils.DEFAULT_CHARSET, null, StringUtils.EMPTY);
+		Map<String, String> map = HttpClientUtils.sendJsonPostRequest(kerberosUrl, requestboydString, false,
+				HttpClientUtils.DEFAULT_CHARSET, HttpClientUtils.DEFAULT_CHARSET, null, StringUtils.EMPTY);
 		String responseBodyString = map.get("resMsg");
 		System.out.println(responseBodyString);
 
 	}
 }
 
+/**
+ * HttpDeleteWithBody
+ * @description It's used to send the request who's type is delete with body
+ * @author Administrator
+ *
+ */
 @NotThreadSafe
 class HttpDeleteWithBody extends HttpEntityEnclosingRequestBase {
 	public static final String METHOD_NAME = "DELETE";

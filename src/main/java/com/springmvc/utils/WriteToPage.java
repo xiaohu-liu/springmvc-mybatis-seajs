@@ -9,9 +9,16 @@ import org.apache.log4j.Logger;
 
 public class WriteToPage {
 
-	private static final String ContentType = "application/json";
+	private static final String CONTENT_TYPE = "application/json";
 	protected static Logger log4j = Logger.getLogger(WriteToPage.class);
 
+	/**
+	 * write the responseBody to the outputStream
+	 * @param response
+	 * 			HttpServletResponse Instance
+	 * @param resultData
+	 * 			The responseBody given
+	 */
 	public static void writeToPage(HttpServletResponse response,
 			String resultData) {
 
@@ -19,7 +26,7 @@ public class WriteToPage {
 		PrintWriter out = null;
 		try {
 			message = resultData;
-			response.setContentType(ContentType);
+			response.setContentType(CONTENT_TYPE);
 			response.setHeader("Cache-Control", "no-cache");
 			response.setCharacterEncoding("UTF-8");
 			out = response.getWriter();
