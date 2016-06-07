@@ -107,4 +107,26 @@ public class User implements Serializable {
 		this.del = del;
 	}
 
+	public User() {
+
+	}
+
+	public User(int id, String openname, String type, String password, int status, long update_time, long create_time,
+			int del) {
+		this.id = id;
+		this.openname = openname;
+		this.type = type;
+		this.password = password;
+		this.status = status;
+		this.update_time = update_time;
+		this.create_time = create_time;
+		this.del = del;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", openname=" + openname + ", type=" + type + ", password=" + password + ", status="
+				+ status + ", update_time=" + update_time + ", create_time=" + create_time + ", del=" + del + "]";
+	}
+
 }
