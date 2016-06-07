@@ -17,10 +17,12 @@ public class UserService {
 	@Autowired
 	private UserMapper userMapper;
 
-	/*
+	/**
 	 * 添加用户
+	 * @param user User to insert 
+	 * @return ResponseBean
+	 * 		 
 	 * 
-	 * @see com.springmvc.dao.UserMapper#insertUser(com.springmvc.entity.User)
 	 */
 	public ResponseBean insertUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -39,10 +41,10 @@ public class UserService {
 
 	}
 
-	/*
+	/**
 	 * 更新用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#updateUser(com.springmvc.entity.User)
+	 * @param user User to update
+	 * @return ResponseBean 
 	 */
 	public ResponseBean updateUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -60,10 +62,9 @@ public class UserService {
 		return bean;
 	}
 
-	/*
+	/**
 	 * 删除用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#deleteUserById(int)
+	 * delete user by id given
 	 */
 	public ResponseBean deleteUserById(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -75,10 +76,9 @@ public class UserService {
 		return bean;
 	}
 
-	/*
+	/**
 	 * list 全部用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#list()
+	 * list all user 
 	 */
 	public ResponseEntityBean list() {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -98,10 +98,11 @@ public class UserService {
 
 	}
 
-	/*
+	/**
 	 * 通过openName查找用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#findByOpenName(java.lang.String)
+	 * @param openName 
+	 * 		  user's openName given
+	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByOpenName(String openName) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -120,10 +121,11 @@ public class UserService {
 		return bean;
 	}
 
-	/*
+	/**
 	 * 通过用户id查找用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#findByUserId(int)
+	 * @param id 
+	 * 		  the user's id given
+	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByUserId(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
