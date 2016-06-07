@@ -18,16 +18,25 @@ public class AreaService implements AreaMapper {
 	@Autowired
 	private AreaMapper areaMapper;
 
+	/**
+	 * get the list of area
+	 */
 	@Override
 	public List<Area> listAll() {
 		return areaMapper.listAll();
 	}
-
+	
+	/**
+	 * query area by id given
+	 */
 	@Override
 	public Area findById(int id) {
 		return areaMapper.findById(id);
 	}
 
+	/**
+	 * get the list of area by pid given
+	 */
 	@Override
 	public List<Area> findByParentId(int pid) {
 		return areaMapper.findByParentId(pid);
@@ -82,6 +91,12 @@ public class AreaService implements AreaMapper {
 		}
 	}
 
+	/**
+	 * @param pid
+	 * 			the pid given
+	 * @return
+	 * @throws RestException
+	 */
 	public ResponseEntityBean findAreasByPid(int pid) throws RestException {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
