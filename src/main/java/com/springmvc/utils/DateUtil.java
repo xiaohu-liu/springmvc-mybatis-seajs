@@ -21,7 +21,7 @@ public final class DateUtil {
 	 * @return
 	 */
 	public static Date convertStringDateAndTime(String dateTime) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat df = new SimpleDateFormat(pattern);
 		Date d = null;
 		try {
 			d = (Date) df.parse(dateTime);
@@ -44,7 +44,7 @@ public final class DateUtil {
 	 * @return
 	 */
 	public static Date convertString_Date(String date) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat df = new SimpleDateFormat(pattern);
 		Date d = null;
 		try {
 			d = (Date) df.parse(date);
@@ -197,7 +197,7 @@ public final class DateUtil {
 	 * @return Date
 	 */
 	public static Date convertStringDate(String date) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat df = new SimpleDateFormat(pattern);
 		Date d = null;
 		try {
 			d = (Date) df.parse(date);
@@ -313,7 +313,7 @@ public final class DateUtil {
 	public final static java.sql.Timestamp string2Time(String dateString)
 			throws java.text.ParseException {
 		Date timeDate = null;
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		DateFormat df = new SimpleDateFormat(pattern);
 		try {
 			timeDate = (Date) df.parse(dateString);
 		} catch (ParseException e) {
@@ -334,7 +334,7 @@ public final class DateUtil {
 	    System.out.println(DateUtil.getDaysBetweenTwoDates(now, nextday));
 		System.out.println();
 		
-		System.out.println(DateUtil.date2String(nextYear(new Date()),"YYYY-MM-dd HH:ss:mm"));
+		System.out.println(DateUtil.date2String(nextYear(new Date()),pattern));
 		System.out.println(new Date().getTime());
 		
 		
