@@ -46,4 +46,19 @@ public class Area implements Serializable {
 		this.pid = pid;
 	}
 
+	public Area() {
+
+	}
+
+	public Area(int id, String area, int pid) {
+		this.id = id;
+		this.area = area;
+		this.pid = pid;
+	}
+
+	@Override
+	public String toString() {
+		return "Area [id=" + id + ", area=" + area + ", pid=" + pid + "]";
+	}
+
 }
