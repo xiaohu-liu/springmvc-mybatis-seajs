@@ -7,6 +7,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @description CookieTool used to operate the cookie
+ * @author Administrator
+ *
+ */
 public class CookieTool {
 
 	
