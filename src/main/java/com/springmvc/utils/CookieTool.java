@@ -7,6 +7,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @description CookieTool used to operate the cookie
+ * @author Administrator
+ *
+ */
 public class CookieTool {
 
 	
@@ -15,7 +20,7 @@ public class CookieTool {
 	 * @param name cookie名字
 	 * @param value cookie值
 	 * @param maxAge 生命周期 以秒为单位
-	 * @author hsq
+	 * @author Administrator
 	 */
 	public static void addCookie(HttpServletResponse response,String name,String value,int maxAge){
 		Cookie cookie = new Cookie(name, value);
@@ -31,7 +36,7 @@ public class CookieTool {
 	/**
 	 * @param request
 	 * @return
-	 * @author hsq
+	 * @author Administrator
 	 */
 	public static Map<String, Cookie> readCookieMap(HttpServletRequest request){
 		Map<String, Cookie> cookieMap = new HashMap<String, Cookie>();
@@ -45,9 +50,11 @@ public class CookieTool {
 	}
 	
 	/**
+	 * get cookie by name given
 	 * @param request
 	 * @param name cookie的名字
 	 * @return
+	 * @author Administrator
 	 */
 	public static Cookie getCookieByName(HttpServletRequest request,String name){
 		Map<String, Cookie> cookieMap = readCookieMap(request);
