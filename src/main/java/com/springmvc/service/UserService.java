@@ -19,9 +19,11 @@ public class UserService {
 
 	/**
 	 * 添加用户
-	 * @param user User to insert 
+	 * 
+	 * @param user
+	 *            User to insert
 	 * @return ResponseBean
-	 * 		 
+	 * 
 	 * 
 	 */
 	public ResponseBean insertUser(User user) {
@@ -32,8 +34,7 @@ public class UserService {
 		if (result) {
 			bean = new ResponseBean(status, msg);
 		} else {
-			bean = new ResponseBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
@@ -43,8 +44,10 @@ public class UserService {
 
 	/**
 	 * 更新用户
-	 * @param user User to update
-	 * @return ResponseBean 
+	 * 
+	 * @param user
+	 *            User to update
+	 * @return ResponseBean
 	 */
 	public ResponseBean updateUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -54,8 +57,7 @@ public class UserService {
 		if (result) {
 			bean = new ResponseBean(status, msg);
 		} else {
-			bean = new ResponseBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
@@ -63,8 +65,7 @@ public class UserService {
 	}
 
 	/**
-	 * 删除用户
-	 * delete user by id given
+	 * 删除用户 delete user by id given
 	 */
 	public ResponseBean deleteUserById(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -72,13 +73,28 @@ public class UserService {
 		userMapper.deleteUserById(id);
 		ResponseBean bean = null;
 		bean = new ResponseBean(status, msg);
-		
+
 		return bean;
 	}
 
 	/**
-	 * list 全部用户
-	 * list all user 
+	 * get user by openName given and password given
+	 * 
+	 * @param openName
+	 * @param password
+	 * @return
+	 */
+	public User findUserByOpenNameAndPwd(String openName, String password) {
+		try {
+			return userMapper.findByOpenNameAndPassword(openName, password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * list 全部用户 list all user
 	 */
 	public ResponseEntityBean list() {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -89,8 +105,7 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(uses);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
@@ -100,8 +115,9 @@ public class UserService {
 
 	/**
 	 * 通过openName查找用户
-	 * @param openName 
-	 * 		  user's openName given
+	 * 
+	 * @param openName
+	 *            user's openName given
 	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByOpenName(String openName) {
@@ -113,8 +129,7 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(user);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
@@ -123,8 +138,9 @@ public class UserService {
 
 	/**
 	 * 通过用户id查找用户
-	 * @param id 
-	 * 		  the user's id given
+	 * 
+	 * @param id
+	 *            the user's id given
 	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByUserId(int id) {
@@ -136,8 +152,7 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(user);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
