@@ -2,6 +2,11 @@ package com.springmvc.entity;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.springmvc.rest.exceptions.RestException;
+import com.springmvc.rest.exceptions.RestExceptionStatus;
+
 public class User implements Serializable {
 
 	/**
@@ -127,6 +132,21 @@ public class User implements Serializable {
 	public String toString() {
 		return "User [id=" + id + ", openname=" + openname + ", type=" + type + ", password=" + password + ", status="
 				+ status + ", update_time=" + update_time + ", create_time=" + create_time + ", del=" + del + "]";
+	}
+
+	/**
+	 * check the validation about the parameter
+	 * 
+	 * @return
+	 * @throws RestException
+	 */
+	public boolean selfCheck() throws RestException {
+		if (StringUtils.isBlank(openname)) {
+			throw new RestException(RestExceptionStatus.BAD_REQUEST.getStatus(), "openname can not be empty");
+		} else if (StringUtils.isBlank(password)) {
+			throw new RestException(RestExceptionStatus.BAD_REQUEST.getStatus(), "password can not be empty");
+		}
+		return true;
 	}
 
 }
