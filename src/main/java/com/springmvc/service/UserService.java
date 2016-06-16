@@ -108,10 +108,25 @@ public class UserService {
 	public ResponseBean deleteUserById(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		userMapper.deleteUserById(id);
 		ResponseBean bean = null;
-		bean = new ResponseBean(status, msg);
-
+		if (userMapper.findByUserId(id) == null) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn(format("User[id=%d] does not exist", id));
+			}
+			return new ResponseBean(RestExceptionStatus.DATA_NOT_EXIST.getStatus(),
+					RestExceptionStatus.DATA_NOT_EXIST.getMsg());
+		} else {
+			try {
+				userMapper.deleteUserById(id);
+				bean = new ResponseBean(status, msg);
+			} catch (Exception e) {
+				if (logger.isEnabledFor(Level.ERROR)) {
+					logger.error("Server Internal Error, Reason: " + e.getMessage(), e);
+				}
+				bean = new ResponseBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(),
+						RestExceptionStatus.INTERNAL_ERROR.getMsg());
+			}
+		}
 		return bean;
 	}
 
