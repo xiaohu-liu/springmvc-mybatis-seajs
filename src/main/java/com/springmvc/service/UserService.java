@@ -90,15 +90,50 @@ public class UserService {
 	public ResponseBean updateUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		boolean result = userMapper.updateUser(user);
 		ResponseBean bean = null;
-		if (result) {
-			bean = new ResponseBean(status, msg);
-		} else {
-			bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+		if (user == null) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn("the parameter submited is null");
+			}
+			return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), "the parameter submited is null");
 		}
 
+		try {
+			if (user.selfCheck()) {
+
+				if (userMapper.findByUserId(user.getId()) == null) {
+					if (logger.isEnabledFor(Level.WARN)) {
+						logger.warn(format("User[id=%d] does not exist", user.getId()));
+					}
+					return new ResponseBean(RestExceptionStatus.DATA_EXIST.getStatus(),
+							format("User[id=%s] exitst", user.getId()));
+				} else {
+					boolean result = userMapper.updateUser(user);
+					
+					if (result) {
+						if (logger.isInfoEnabled()) {
+							logger.info(format("User[id=%d]update successfully", user.getId()));
+						}
+						bean = new ResponseBean(status, msg);
+					} else {
+						bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+								RestExceptionStatus.OPERATION_FAILED.getMsg());
+					}
+					return bean;
+				}
+
+			}
+		} catch (RestException e) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn(format("User selfCheck failed , Reason: %s", e.getMessage()), e);
+			}
+			return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), e.getMessage());
+		} catch (Exception ee) {
+			if (logger.isEnabledFor(Level.ERROR)) {
+				logger.error(format("SqlError occurs, Reason: %s", ee.getMessage()), ee);
+			}
+			return new ResponseBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), "SqlError occurs");
+		}
 		return bean;
 	}
 
