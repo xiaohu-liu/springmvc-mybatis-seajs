@@ -1,19 +1,21 @@
 package com.springmvc.service;
 
+import static java.lang.String.format;
+
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.springmvc.mapper.UserMapper;
 import com.springmvc.entity.User;
+import com.springmvc.mapper.UserMapper;
 import com.springmvc.rest.bean.ResponseBean;
 import com.springmvc.rest.bean.ResponseEntityBean;
 import com.springmvc.rest.exceptions.RestException;
 import com.springmvc.rest.exceptions.RestExceptionStatus;
-import static java.lang.String.*;
 
 @Service
 public class UserService {
@@ -138,12 +140,30 @@ public class UserService {
 	 * @return
 	 */
 	public User findUserByOpenNameAndPwd(String openName, String password) {
+		User user = null;
 		try {
-			return userMapper.findByOpenNameAndPassword(openName, password);
-		} catch (Exception e) {
-			e.printStackTrace();
+			
+			if(StringUtils.isBlank(openName)){
+				throw new RestException(RestExceptionStatus.BAD_REQ_PARAM.getStatus(), "openName can not be null");
+			} else if(StringUtils.isBlank(password)){
+				throw new RestException(RestExceptionStatus.BAD_REQ_PARAM.getStatus(), "password can not be null");
+			}
+			user =  userMapper.findByOpenNameAndPassword(openName, password);
+			
+		} catch (RestException e) {
+			if(logger.isEnabledFor(Level.WARN)){
+				logger.warn(format("Bad parameter sumited , %s", e.getMessage()));
+			}
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error(e);
+			}
+		}catch (Exception ee) {
+			ee.printStackTrace();
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error("Internal Error occurs", ee);
+			}
 		}
-		return null;
+		return user;
 	}
 
 	/**
