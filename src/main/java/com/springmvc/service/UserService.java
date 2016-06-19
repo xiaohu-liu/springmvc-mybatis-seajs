@@ -2,8 +2,10 @@ package com.springmvc.service;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.springframework.aop.ThrowsAdvice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -173,10 +175,34 @@ public class UserService {
 	 * @return
 	 */
 	public User findUserByOpenNameAndPwd(String openName, String password) {
+		
+	
+		
+		
 		try {
-			return userMapper.findByOpenNameAndPassword(openName, password);
-		} catch (Exception e) {
-			e.printStackTrace();
+			
+			if(StringUtils.isBlank(openName)){
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn("bad parameter ,Reason: openName can not be empty");
+				}
+				throw new RestException(RestExceptionStatus.BAD_REQ_PARAM.getStatus(), "openName can not be empty");
+			} else if(StringUtils.isBlank(password)){
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn("bad parameter, Reason: password can not be empty");
+				}
+				throw new RestException(RestExceptionStatus.BAD_REQ_PARAM.getStatus(), "password can not be empty");
+			} else {				
+				return userMapper.findByOpenNameAndPassword(openName, password);
+			}
+		} catch (RestException e) {
+			
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error(e.getMessage() , e);
+			}
+		} catch (Exception ee) {
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error("Internal Error", ee);
+			}
 		}
 		return null;
 	}
