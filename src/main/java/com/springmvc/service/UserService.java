@@ -109,7 +109,7 @@ public class UserService {
 							format("User[id=%s] exitst", user.getId()));
 				} else {
 					boolean result = userMapper.updateUser(user);
-
+					
 					if (result) {
 						if (logger.isInfoEnabled()) {
 							logger.info(format("User[id=%d]update successfully", user.getId()));
@@ -209,33 +209,17 @@ public class UserService {
 	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByOpenName(String openName) {
+		//test
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-
-		if (org.apache.commons.lang.StringUtils.isBlank(openName)) {
-			if (logger.isEnabledFor(Level.WARN)) {
-				logger.warn("parameter openname can not be empty");
-			}
-			return new ResponseEntityBean(RestExceptionStatus.BAD_REQ_PARAM.getStatus(),
-					RestExceptionStatus.BAD_REQ_PARAM.getMsg());
-		}
+		User user = userMapper.findByOpenName(openName);
 		ResponseEntityBean bean = null;
-		try {
-			User user = userMapper.findByOpenName(openName);
-
-			if (user != null) {
-				bean = new ResponseEntityBean(status, msg);
-				bean.setEntity(user);
-			} else {
-				bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-						RestExceptionStatus.OPERATION_FAILED.getMsg());
-			}
-		} catch (Exception e) {
-			if (logger.isEnabledFor(Level.ERROR)) {
-				logger.error("Internal Error", e);
-			}
-			
-			bean = new ResponseEntityBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), RestExceptionStatus.INTERNAL_ERROR.getMsg());
+		if (user != null) {
+			bean = new ResponseEntityBean(status, msg);
+			bean.setEntity(user);
+		} else {
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
 		return bean;
