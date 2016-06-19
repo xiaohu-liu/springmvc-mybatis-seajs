@@ -209,6 +209,7 @@ public class UserService {
 	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByOpenName(String openName) {
+		//test
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
 		User user = userMapper.findByOpenName(openName);
