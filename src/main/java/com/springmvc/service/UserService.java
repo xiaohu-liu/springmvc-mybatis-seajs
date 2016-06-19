@@ -90,15 +90,50 @@ public class UserService {
 	public ResponseBean updateUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		boolean result = userMapper.updateUser(user);
 		ResponseBean bean = null;
-		if (result) {
-			bean = new ResponseBean(status, msg);
-		} else {
-			bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+		if (user == null) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn("the parameter submited is null");
+			}
+			return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), "the parameter submited is null");
 		}
 
+		try {
+			if (user.selfCheck()) {
+
+				if (userMapper.findByUserId(user.getId()) == null) {
+					if (logger.isEnabledFor(Level.WARN)) {
+						logger.warn(format("User[id=%d] does not exist", user.getId()));
+					}
+					return new ResponseBean(RestExceptionStatus.DATA_EXIST.getStatus(),
+							format("User[id=%s] exitst", user.getId()));
+				} else {
+					boolean result = userMapper.updateUser(user);
+
+					if (result) {
+						if (logger.isInfoEnabled()) {
+							logger.info(format("User[id=%d]update successfully", user.getId()));
+						}
+						bean = new ResponseBean(status, msg);
+					} else {
+						bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+								RestExceptionStatus.OPERATION_FAILED.getMsg());
+					}
+					return bean;
+				}
+
+			}
+		} catch (RestException e) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn(format("User selfCheck failed , Reason: %s", e.getMessage()), e);
+			}
+			return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), e.getMessage());
+		} catch (Exception ee) {
+			if (logger.isEnabledFor(Level.ERROR)) {
+				logger.error(format("SqlError occurs, Reason: %s", ee.getMessage()), ee);
+			}
+			return new ResponseBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), "SqlError occurs");
+		}
 		return bean;
 	}
 
@@ -176,14 +211,31 @@ public class UserService {
 	public ResponseEntityBean findByOpenName(String openName) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		User user = userMapper.findByOpenName(openName);
+
+		if (org.apache.commons.lang.StringUtils.isBlank(openName)) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn("parameter openname can not be empty");
+			}
+			return new ResponseEntityBean(RestExceptionStatus.BAD_REQ_PARAM.getStatus(),
+					RestExceptionStatus.BAD_REQ_PARAM.getMsg());
+		}
 		ResponseEntityBean bean = null;
-		if (user != null) {
-			bean = new ResponseEntityBean(status, msg);
-			bean.setEntity(user);
-		} else {
-			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+		try {
+			User user = userMapper.findByOpenName(openName);
+
+			if (user != null) {
+				bean = new ResponseEntityBean(status, msg);
+				bean.setEntity(user);
+			} else {
+				bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+						RestExceptionStatus.OPERATION_FAILED.getMsg());
+			}
+		} catch (Exception e) {
+			if (logger.isEnabledFor(Level.ERROR)) {
+				logger.error("Internal Error", e);
+			}
+			
+			bean = new ResponseEntityBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), RestExceptionStatus.INTERNAL_ERROR.getMsg());
 		}
 
 		return bean;
