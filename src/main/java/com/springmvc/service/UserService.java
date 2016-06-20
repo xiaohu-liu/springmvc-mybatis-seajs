@@ -213,14 +213,21 @@ public class UserService {
 	public ResponseEntityBean list() {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		List<User> uses = userMapper.list();
 		ResponseEntityBean bean = null;
-		if (uses != null) {
-			bean = new ResponseEntityBean(status, msg);
-			bean.setEntity(uses);
-		} else {
-			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+		try {
+			List<User> uses = userMapper.list();
+			if (uses != null) {
+				bean = new ResponseEntityBean(status, msg);
+				bean.setEntity(uses);
+			} else {
+				bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+						RestExceptionStatus.OPERATION_FAILED.getMsg());
+			}
+		} catch (Exception e) {
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error(e);
+			}
+			bean = new ResponseEntityBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), e.getMessage());
 		}
 
 		return bean;
@@ -294,6 +301,8 @@ public class UserService {
 			if(logger.isEnabledFor(Level.ERROR)){
 				logger.error(e);
 			}
+			
+			bean = new ResponseEntityBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), RestExceptionStatus.INTERNAL_ERROR.getMsg());
 		}
 		
 
