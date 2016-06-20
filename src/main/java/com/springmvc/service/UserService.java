@@ -277,15 +277,25 @@ public class UserService {
 	public ResponseEntityBean findByUserId(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		User user = userMapper.findByUserId(id);
 		ResponseEntityBean bean = null;
-		if (user != null) {
-			bean = new ResponseEntityBean(status, msg);
-			bean.setEntity(user);
-		} else {
-			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+		try{
+			User user = userMapper.findByUserId(id);
+			if (user != null) {
+				bean = new ResponseEntityBean(status, msg);
+				bean.setEntity(user);
+			} else {
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn(format("User[id=%d] dose not exist", id));
+				}
+				bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+						RestExceptionStatus.OPERATION_FAILED.getMsg());
+			}
+		}catch(Exception e){
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error(e);
+			}
 		}
+		
 
 		return bean;
 	}
