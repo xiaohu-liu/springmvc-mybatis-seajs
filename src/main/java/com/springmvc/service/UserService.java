@@ -1,21 +1,21 @@
 package com.springmvc.service;
 
+import static java.lang.String.format;
+
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.aop.ThrowsAdvice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.springmvc.mapper.UserMapper;
 import com.springmvc.entity.User;
+import com.springmvc.mapper.UserMapper;
 import com.springmvc.rest.bean.ResponseBean;
 import com.springmvc.rest.bean.ResponseEntityBean;
 import com.springmvc.rest.exceptions.RestException;
 import com.springmvc.rest.exceptions.RestExceptionStatus;
-import static java.lang.String.*;
 
 @Service
 public class UserService {
