@@ -8,10 +8,10 @@ public enum RestExceptionStatus {
     AUTH_FAILED(400, "Authentication failed"),
     BAD_REQUEST(401, "Bad request"),
     OPERATION_FAILED(1, "Operation failed"),
-    NOT_FOUND(404, "404 Not found"),
+    NOT_FOUND(404, "Not found"),
     INTERNAL_ERROR(500, "Internal error"),
 
-    DATA_EXIST(601,"The data submit already exists"),
+    DATA_EXIST(601,"The data submited already exists"),
     DATA_NOT_EXIST(602,"The data requested dose not exist"),
     
     
