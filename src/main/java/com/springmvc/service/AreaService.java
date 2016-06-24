@@ -3,6 +3,8 @@ package com.springmvc.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.UIDFolder;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +63,15 @@ public class AreaService implements AreaMapper {
 			List<Area> areas = listAll();
 			ResponseEntityBean bean = new ResponseEntityBean(status, msg);
 			if (areas != null) {
+				if(logger.isInfoEnabled()){
+					logger.info("list all Areas success, and total size is " + areas.size());
+				}
 				bean.setEntity(areas);
 			} else {
+				
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn("there is no any element of area type");
+				}
 				bean.setEntity(new ArrayList<Area>());
 			}
 			return bean;
