@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class WriteToPage {
@@ -14,13 +15,13 @@ public class WriteToPage {
 
 	/**
 	 * write the responseBody to the outputStream
+	 * 
 	 * @param response
-	 * 			HttpServletResponse Instance
+	 *            HttpServletResponse Instance
 	 * @param resultData
-	 * 			The responseBody given
+	 *            The responseBody given
 	 */
-	public static void writeToPage(HttpServletResponse response,
-			String resultData) {
+	public static void writeToPage(HttpServletResponse response, String resultData) {
 
 		String message = StringUtils.EMPTY;
 		PrintWriter out = null;
@@ -32,11 +33,18 @@ public class WriteToPage {
 			out = response.getWriter();
 		} catch (Exception e) {
 			message = "";
+			if (log4j.isEnabledFor(Level.ERROR)) {
+				log4j.error(e);
+			}
 		} finally {
-			log4j.info("response:" + message);
-			out.print(message);
-			out.flush();
-			out.close();
+			if (log4j.isInfoEnabled()) {
+				log4j.info("response:" + message);
+			}
+			if (out != null) {
+				out.print(message);
+				out.flush();
+				out.close();
+			}
 		}
 	}
 }
