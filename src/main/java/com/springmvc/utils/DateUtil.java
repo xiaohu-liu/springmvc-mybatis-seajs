@@ -182,6 +182,10 @@ public final class DateUtil {
 		return sdf.format(c.getTime());
 	}
 	
+	/**
+	 * get the date string value three months later
+	 * @return
+	 */
 	public static String threeMonthLater(){
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.pattern);
@@ -207,6 +211,12 @@ public final class DateUtil {
 		return d;
 	}
 
+	/**
+	 * get the Date object one day after the of date given
+	 * @param d
+	 * 			parameter date given to according to 
+	 * @return
+	 */
 	public static Date nextDay(Date d) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(d);
@@ -215,6 +225,12 @@ public final class DateUtil {
 		return calendar.getTime();
 	}
 	
+	/**
+	 * get the Date object one month after the  month given
+	 * @param d
+	 * 		parameter date given to according to 
+	 * @return
+	 */
 	public static Date nextMonth(Date d) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(d);
@@ -224,6 +240,12 @@ public final class DateUtil {
 	}
 	
 	
+	/**
+	 * get the Date object one year after the date given
+	 * @param d
+	 * 		parameter date given to according to 
+	 * @return
+	 */
 	public static Date nextYear(Date d){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(d);
