@@ -2,6 +2,8 @@ package com.springmvc.service;
 
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,40 +11,81 @@ import com.springmvc.mapper.UserMapper;
 import com.springmvc.entity.User;
 import com.springmvc.rest.bean.ResponseBean;
 import com.springmvc.rest.bean.ResponseEntityBean;
+import com.springmvc.rest.exceptions.RestException;
 import com.springmvc.rest.exceptions.RestExceptionStatus;
+import static java.lang.String.*;
 
 @Service
 public class UserService {
 
+	private static Logger logger = Logger.getLogger(UserService.class);
 	@Autowired
 	private UserMapper userMapper;
 
-	/*
+	/**
 	 * 添加用户
 	 * 
-	 * @see com.springmvc.dao.UserMapper#insertUser(com.springmvc.entity.User)
+	 * @param user
+	 *            User to insert
+	 * @return ResponseBean
+	 * 
+	 * 
 	 */
 	public ResponseBean insertUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
 		String msg = RestExceptionStatus.SUCCESS.getMsg();
-		boolean result = userMapper.insertUser(user);
 		ResponseBean bean = null;
-		if (result) {
-			bean = new ResponseBean(status, msg);
+		if (user == null) {
+			if (logger.isEnabledFor(Level.WARN)) {
+				logger.warn("the parameter submited is null");
+			}
+			return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), "the parameter submited is null");
 		} else {
-			bean = new ResponseBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
-					RestExceptionStatus.OPERATION_FAILED.getMsg());
+
+			try {
+				if (user.selfCheck()) {
+					if (userMapper.findByOpenNameAndPassword(user.getOpenname(), user.getPassword()) != null) {
+						if (logger.isEnabledFor(Level.WARN)) {
+							logger.warn(format("User[openname=%s] exitst", user.getOpenname()));
+						}
+						return new ResponseBean(RestExceptionStatus.DATA_EXIST.getStatus(),
+								format("User[openname=%s] exitst", user.getOpenname()));
+					} else {
+						boolean result = userMapper.insertUser(user);
+						if (result) {
+							bean = new ResponseBean(status, msg);
+							if (logger.isInfoEnabled()) {
+								logger.info("insert successfully");
+							}
+						} else {
+							bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
+									RestExceptionStatus.OPERATION_FAILED.getMsg());
+						}
+					}
+				}
+			} catch (RestException e) {
+				if (logger.isEnabledFor(Level.WARN)) {
+					logger.warn(format("User selfCheck failed , Reason: %s", e.getMessage()), e);
+				}
+				return new ResponseBean(RestExceptionStatus.BAD_REQUEST.getStatus(), e.getMessage());
+			} catch (Exception ee) {
+				if (logger.isEnabledFor(Level.ERROR)) {
+					logger.error(format("SqlError occurs, Reason: %s", ee.getMessage()), ee);
+				}
+				return new ResponseBean(RestExceptionStatus.INTERNAL_ERROR.getStatus(), "SqlError occurs");
+			}
 		}
 
 		return bean;
 
 	}
 
-	/*
+	/**
 	 * 更新用户
 	 * 
-	 * @see com.springmvc.dao.UserMapper#updateUser(com.springmvc.entity.User)
+	 * @param user
+	 *            User to update
+	 * @return ResponseBean
 	 */
 	public ResponseBean updateUser(User user) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -52,18 +95,15 @@ public class UserService {
 		if (result) {
 			bean = new ResponseBean(status, msg);
 		} else {
-			bean = new ResponseBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
 		return bean;
 	}
 
-	/*
-	 * 删除用户
-	 * 
-	 * @see com.springmvc.dao.UserMapper#deleteUserById(int)
+	/**
+	 * 删除用户 delete user by id given
 	 */
 	public ResponseBean deleteUserById(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -71,14 +111,28 @@ public class UserService {
 		userMapper.deleteUserById(id);
 		ResponseBean bean = null;
 		bean = new ResponseBean(status, msg);
-		
+
 		return bean;
 	}
 
-	/*
-	 * list 全部用户
+	/**
+	 * get user by openName given and password given
 	 * 
-	 * @see com.springmvc.dao.UserMapper#list()
+	 * @param openName
+	 * @param password
+	 * @return
+	 */
+	public User findUserByOpenNameAndPwd(String openName, String password) {
+		try {
+			return userMapper.findByOpenNameAndPassword(openName, password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * list 全部用户 list all user
 	 */
 	public ResponseEntityBean list() {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -89,8 +143,7 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(uses);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
@@ -98,10 +151,12 @@ public class UserService {
 
 	}
 
-	/*
+	/**
 	 * 通过openName查找用户
 	 * 
-	 * @see com.springmvc.dao.UserMapper#findByOpenName(java.lang.String)
+	 * @param openName
+	 *            user's openName given
+	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByOpenName(String openName) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -112,18 +167,19 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(user);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 
 		return bean;
 	}
 
-	/*
+	/**
 	 * 通过用户id查找用户
 	 * 
-	 * @see com.springmvc.dao.UserMapper#findByUserId(int)
+	 * @param id
+	 *            the user's id given
+	 * @return ResponseEntityBean
 	 */
 	public ResponseEntityBean findByUserId(int id) {
 		int status = RestExceptionStatus.SUCCESS.getStatus();
@@ -134,8 +190,7 @@ public class UserService {
 			bean = new ResponseEntityBean(status, msg);
 			bean.setEntity(user);
 		} else {
-			bean = new ResponseEntityBean(
-					RestExceptionStatus.OPERATION_FAILED.getStatus(),
+			bean = new ResponseEntityBean(RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					RestExceptionStatus.OPERATION_FAILED.getMsg());
 		}
 

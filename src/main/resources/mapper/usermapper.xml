@@ -42,11 +42,19 @@
 
 	<select id="findByUserId" resultType="User">
 		select * from sp_user
-		where id = #{id}
+		where
+		id = #{id}
+	</select>
+
+	<select id="findByOpenNameAndPassword" resultType="User">
+		select * from
+		sp_user
+		where `openname` = #{openName} AND `password`=#{password}
 	</select>
 
 	<select id="list" resultType="User">
-		select * from sp_user where del=0 order by id desc
+		select * from sp_user where del=0
+		order by id desc
 	</select>
 
 	<select id="findByOpenName" resultType="User">
