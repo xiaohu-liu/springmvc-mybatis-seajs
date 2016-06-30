@@ -3,6 +3,10 @@ package com.springmvc.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.UIDFolder;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +16,14 @@ import com.springmvc.rest.bean.ResponseEntityBean;
 import com.springmvc.rest.exceptions.RestException;
 import com.springmvc.rest.exceptions.RestExceptionStatus;
 
+import static java.lang.String.format;
+
 @Service
 public class AreaService implements AreaMapper {
 
+	
+	private static Logger logger = Logger.getLogger(AreaService.class);
+ 	
 	@Autowired
 	private AreaMapper areaMapper;
 
@@ -54,12 +63,22 @@ public class AreaService implements AreaMapper {
 			List<Area> areas = listAll();
 			ResponseEntityBean bean = new ResponseEntityBean(status, msg);
 			if (areas != null) {
+				if(logger.isInfoEnabled()){
+					logger.info("list all Areas success, and total size is " + areas.size());
+				}
 				bean.setEntity(areas);
 			} else {
+				
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn("there is no any element of area type");
+				}
 				bean.setEntity(new ArrayList<Area>());
 			}
 			return bean;
 		} catch (Exception e) {
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error("Internal Error occurs, Reason: ", e);
+			}
 			throw new RestException(
 					RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					e.getMessage());
@@ -81,10 +100,23 @@ public class AreaService implements AreaMapper {
 			ResponseEntityBean bean = new ResponseEntityBean(status, msg);
 			Area area = findById(id);
 			if (area != null) {
+				if(logger.isInfoEnabled()){
+					logger.info(format("success find Area[id=%d]", id));
+				}
 				bean.setEntity(area);
+			} else {
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn(format("Area[id=%d] does not exist", id));
+				}
+				bean.setMessage(RestExceptionStatus.DATA_NOT_EXIST.getMsg());
+				bean.setStatus(RestExceptionStatus.DATA_NOT_EXIST.getStatus());
 			}
 			return bean;
 		} catch (Exception e) {
+			
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error("Internal Error occurs, Reason: ", e);
+			}
 			throw new RestException(
 					RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					e.getMessage());
@@ -104,12 +136,23 @@ public class AreaService implements AreaMapper {
 			ResponseEntityBean bean = new ResponseEntityBean(status, msg);
 			List<Area> areas = findByParentId(pid);
 			if (areas != null) {
+				if(logger.isInfoEnabled()){
+					logger.info(format("success to find Area[pid=]", pid));
+				}
 				bean.setEntity(areas);
 			} else {
+				if(logger.isEnabledFor(Level.WARN)){
+					logger.warn(format("Areas[pid=%d] does not exist", pid));
+				}
+				bean.setMessage(RestExceptionStatus.DATA_NOT_EXIST.getMsg());
+				bean.setStatus(RestExceptionStatus.DATA_NOT_EXIST.getStatus());
 				bean.setEntity(new ArrayList<Area>());
 			}
 			return bean;
 		} catch (Exception e) {
+			if(logger.isEnabledFor(Level.ERROR)){
+				logger.error("Internal Error occurs, Reason: ", e);
+			}
 			throw new RestException(
 					RestExceptionStatus.OPERATION_FAILED.getStatus(),
 					e.getMessage());

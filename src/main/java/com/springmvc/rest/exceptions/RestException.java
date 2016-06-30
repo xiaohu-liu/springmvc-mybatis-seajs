@@ -31,6 +31,11 @@ public class RestException extends Exception {
 		this.status = status;
 		this.message = message;
 	}
+	
+	public RestException(RestExceptionStatus rs){
+		this.status = rs.getStatus();
+		this.message = rs.getMsg();
+	}
 
 	public Integer getStatus() {
 		return status;
