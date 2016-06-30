@@ -7,6 +7,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springmvc Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+	
+	<properties>
+		<test.skip>false</test.skip>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -126,9 +130,9 @@
 		</dependency>
 		<!-- http://mvnrepository.com/artifact/com.alibaba/fastjson -->
 		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>fastjson</artifactId>
-		    <version>1.2.12</version>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.12</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
@@ -203,5 +207,30 @@
 	</dependencies>
 	<build>
 		<finalName>springmvc</finalName>
+
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<outputDirectory>target/classes</outputDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skip>${test.skip}</skip>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>
